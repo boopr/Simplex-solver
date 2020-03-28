@@ -1,7 +1,7 @@
 import numpy as np
 
 from flask import Flask
-from flask import render_template, request
+from flask import render_template
 
 from src.SimplexSolver import SimplexSolver
 
@@ -15,21 +15,24 @@ def input_matrix(name):
     print(f"Enter matrix {name}, MATLAB form ([x1 x2 x3; x4 x5 x6])")
 
     while not correct:
+        matrix = []
         user_input = input(f"{name} = ")
+        try:
+            user_input = user_input.strip().strip('[').strip(']')
+            rows = user_input.replace('; ', ';').split(';')
+            for row in rows:
+                frow = []
+                for val in row.split(' '):
+                    if val != ' ':
+                        frow.append(float(val.strip()))
+                matrix.append(frow)
 
-        user_input = user_input.strip().strip('[').strip(']')
-        rows = user_input.replace('; ', ';').split(';')
-        for row in rows:
-            frow = []
-            for val in row.split(' '):
-                if val != ' ':
-                    frow.append(float(val.strip()))
-            matrix.append(frow)
-
-        matrix = np.asarray(matrix)
-        print(matrix)
-        correct = input("Is it correct? [Y/n]").lower().strip() == 'y'
-
+            matrix = np.asarray(matrix)
+            print(matrix)
+            correct = input("Is it correct? [Y/n]").lower().strip() == 'y'
+        except ValueError as e:
+            print(f"Error while reading your entry, please try again ('{user_input}')")
+            correct = False
 
     return matrix
 

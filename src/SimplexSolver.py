@@ -106,7 +106,7 @@ class SimplexSolver:
         val = []
         output_temp = "l = \\text{argmin}\\left\\{"
         for i, (num, den) in enumerate(zip(numerators, denumerators)):
-            if den != 0 and num / den > 0:
+            if den != 0 and num / den >= 0:
                 output_temp += f"{num/den}"
                 val.append(num / den)
             else:
