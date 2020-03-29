@@ -63,7 +63,6 @@ class SimplexSolver:
             # Step 4
             o.add_subsubsection(f"[{v}] Step 4 - Variable entering or leaving the basis \\(x_h\\)")
             smallest = c_T_non_base_bar[0, 0]
-            in_index = self.indexes_non_base[0]
             h = 0
             output_temp = "\\text{min}\\left("
             for i, (_, value) in enumerate(zip(self.indexes_non_base, c_T_non_base_bar[0])):
@@ -87,9 +86,21 @@ class SimplexSolver:
             self.indexes_non_base = np.sort(self.indexes_non_base)
 
             v += 1
+
+        solution = [*zip(self.indexes_base, b_bar.flatten()), *zip(self.indexes_non_base, [0 for _ in range(self.indexes_non_base.size)])]
+        solution.sort(key=lambda x: x[0])
+
+        output_temp = "Solutions = \\begin{cases}"
+
+        for i, (index, value) in enumerate(solution):
+            output_temp += f"x_{index} = {value} = {float(value)}"
+            if i != len(solution) - 1:
+                output_temp += "\\\\"
+
+        output_temp += "\\end{cases}"
+
         self.output.add_reveal(o, "development", "simplex_dev")
-        self.output.add_matrix(b_bar, "Solution")
-        self.output.add_matrix(b_bar, "Solution", compute_frac=True)
+        self.output.add_math(output_temp)
 
         return 0
 
