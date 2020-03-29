@@ -39,12 +39,15 @@ class OutputFormater:
     def add_br(self):
         self.add_lonely("br")
 
-    def add_matrix(self, matrix, name):
+    def add_matrix(self, matrix, name, compute_frac=False):
         content = f"{name} = \\left(\\begin{{matrix}}"
 
         for i, row in enumerate(matrix):
             for j, val in enumerate(row):
-                content += str(val)
+                if compute_frac:
+                    content += str(float(val))
+                else:
+                    content += str(val)
                 if j != len(row) - 1:
                     content += "&"
             if i != len(matrix) - 1:

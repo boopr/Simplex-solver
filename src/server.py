@@ -1,5 +1,7 @@
 import numpy as np
 
+from fractions import Fraction
+
 from flask import Flask
 from flask import render_template
 
@@ -24,11 +26,18 @@ def input_matrix(name):
                 frow = []
                 for val in row.split(' '):
                     if val != ' ':
-                        frow.append(float(val.strip()))
+                        frow.append(Fraction(val.strip()))
                 matrix.append(frow)
 
             matrix = np.asarray(matrix)
-            print(matrix)
+
+            to_print = []
+            for i in matrix:
+                r = []
+                for j in i:
+                    r.append(str(j))
+                to_print.append(r)
+            print(np.asarray(to_print))
             correct = input("Is it correct? [Y/n]").lower().strip() == 'y'
         except ValueError as e:
             print(f"Error while reading your entry, please try again ('{user_input}')")
@@ -42,9 +51,8 @@ def hello():
     A = input_matrix('A')
     c_T = input_matrix('c^T')
     b = input_matrix('b')
-    start_point = input_matrix('Start point')[0]
 
-    s = SimplexSolver(A, b, c_T, start_point)
+    s = SimplexSolver(A, b, c_T)
     s.solve()
 
     return render_template('output.html', content=s.output)

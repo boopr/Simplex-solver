@@ -1,10 +1,11 @@
 import numpy as np
 
+from src.matrix_operations import get_matrix_inverse
 from src.OutputFormater import OutputFormater
 
 
 class SimplexSolver:
-    def __init__(self, A: np.ndarray, b: np.ndarray, c_T: np.ndarray, start: tuple):
+    def __init__(self, A: np.ndarray, b: np.ndarray, c_T: np.ndarray):
         self.A = A
         self.b = b
         self.c_T = c_T[0]
@@ -44,9 +45,9 @@ class SimplexSolver:
 
             o.add_subsubsection(f"[{v}] Step 2 - Matrices \\(\\bar{{b}}\\) and \\(\\bar{{A}}\\)")
             # Step 2
-            b_bar = np.linalg.inv(B) @ self.b
-            A_bar = np.linalg.inv(B) @ N
-            o.add_matrix(np.linalg.inv(B), name="B^{-1}")
+            b_bar = get_matrix_inverse(B) @ self.b
+            A_bar = get_matrix_inverse(B) @ N
+            o.add_matrix(get_matrix_inverse(B), name="B^{-1}")
             o.add_matrix(b_bar, name="\\bar{{b}} = B^{-1} \\times b")
             o.add_matrix(A_bar, name="\\bar{{A}} = B^{-1} \\times N")
 
@@ -88,6 +89,8 @@ class SimplexSolver:
             v += 1
         self.output.add_reveal(o, "development", "simplex_dev")
         self.output.add_matrix(b_bar, "Solution")
+        self.output.add_matrix(b_bar, "Solution", compute_frac=True)
+
         return 0
 
     def get_base(self):
@@ -106,12 +109,12 @@ class SimplexSolver:
         val = []
         output_temp = "l = \\text{argmin}\\left\\{"
         for i, (num, den) in enumerate(zip(numerators, denumerators)):
-            if den != 0 and num / den >= 0:
-                output_temp += f"{num/den}"
-                val.append(num / den)
-            else:
+            if den == 0 or num / den < 0 or (num == 0 and den < 0):
                 output_temp += "+\\infty"
                 val.append(np.inf)
+            else:
+                output_temp += f"{num / den}"
+                val.append(num / den)
             if i != len(numerators) - 1:
                 output_temp += ", "
         output_temp += f"\\right\\}} = {val.index(min(val)) + 1}"
